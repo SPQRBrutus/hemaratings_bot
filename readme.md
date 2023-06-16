@@ -10,6 +10,8 @@ To invite bot follow this link:
 
 https://discord.com/api/oauth2/authorize?client_id=1085532549650059264&permissions=2147503104&scope=applications.commands%20bot
 
+Use with command `/hemaratings <Name>`
+
 
 ## Features
 
