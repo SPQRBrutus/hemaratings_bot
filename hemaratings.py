@@ -2,8 +2,9 @@
 import os
 import requests
 import discord
-from dotenv import load_dotenv
+from discord.ext import tasks
 from discord import app_commands
+from dotenv import load_dotenv
 from bs4 import BeautifulSoup
 from thefuzz import fuzz
 
@@ -19,15 +20,12 @@ fencers = []
 @client.event
 async def on_ready():
     """Load data and start bot session."""
-    print('Loading fencers...')
-    get_fencers()  # Load fencers
-    print('Fencers loaded with ' + str(len(fencers)) + ' entries')
+    reload_fencers.start()
     print(f'Logged in as {client.user} (ID: {client.user.id})')
     print('------')
     await tree.sync()
 
 # Display hemaratings by name
-
 @tree.command(name="hemaratings", description="Display hemaratings by name")
 async def hemaratings(ctx, name: str):
     """Display hemaratings by name command."""
@@ -42,8 +40,6 @@ async def hemaratings(ctx, name: str):
         )
 
 # Find fencer by name
-
-
 def find_fencer(name):
     """Find fencer by name using fuzzy search."""
     for fencer in fencers:
@@ -54,8 +50,6 @@ def find_fencer(name):
     return False
 
 # Get fencer info from hemaratings.com
-
-
 def get_fencer_info(fencer):
     """Get fencer info from hemaratings.com."""
     url = "https://hemaratings.com" + fencer["href"]
@@ -100,9 +94,7 @@ def get_fencer_info(fencer):
     return embed
 
 # Get all fencers from hemaratings.com
-
-
-def get_fencers():
+async def get_fencers():
     """Get all fencers from hemaratings.com."""
     url = "https://hemaratings.com/fighters/"
     response = requests.get(url, timeout=30)
@@ -111,6 +103,7 @@ def get_fencers():
 
     table = soup.find("table", {"id": "mainTable"})  # find the table by its ID
     rows = table.find_all("tr")  # find all rows in the table
+    fencers.clear()  # clear the fencers list
 
     for row in rows:
         cells = row.find_all("td")  # find all cells in the row
@@ -123,5 +116,12 @@ def get_fencers():
                     "text": anchor.text
                 })
 
+# Reload fencers every 24 hours
+@tasks.loop(hours=24)
+async def reload_fencers():
+    """Reloads the fencers and prints the number of entries loaded."""
+    print('Loading fencers...')
+    await get_fencers()
+    print('Fencers loaded with ' + str(len(fencers)) + ' entries')
 
 client.run(os.getenv("DISCORD_API_KEY"))
