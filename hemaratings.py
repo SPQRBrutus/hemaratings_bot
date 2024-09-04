@@ -96,8 +96,11 @@ def get_fencer_info(fencer):
     for row in rows:
         cells = row.find_all("td")
         rating = re.sub(r"\(.*?\)", "", cells[1].text)
-        value = rating + " (" + cells[2].text + ") ".replace("\n", "")
-        embed.add_field(name=cells[0].text, value=value, inline=True)
+        embed.add_field(
+            name=cells[0].text,
+            value=rating + " (" + cells[2].text + ") ".replace("\n", ""),
+            inline=True
+        )
 
     return embed
 
