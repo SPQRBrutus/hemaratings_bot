@@ -1,8 +1,8 @@
 """Module for the hemaratings Discord bot."""
 import os
+import re
 import requests
 import discord
-import re
 from discord.ext import tasks
 from discord import app_commands
 from dotenv import load_dotenv
@@ -49,7 +49,7 @@ def find_fencer(name):
         if fencer["text"].lower() == name.lower():
             return fencer
 
-    for fencer in fencers:        
+    for fencer in fencers:
         # Calculate similarity score
         score = fuzz.token_sort_ratio(fencer["text"], name)
         if score > 80:
