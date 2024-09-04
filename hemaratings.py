@@ -2,6 +2,7 @@
 import os
 import requests
 import discord
+import re
 from discord.ext import tasks
 from discord import app_commands
 from dotenv import load_dotenv
@@ -42,7 +43,13 @@ async def hemaratings(ctx, name: str):
 # Find fencer by name
 def find_fencer(name):
     """Find fencer by name using fuzzy search."""
+
+    #Exact match
     for fencer in fencers:
+        if fencer["text"].lower() == name.lower():
+            return fencer
+
+    for fencer in fencers:        
         # Calculate similarity score
         score = fuzz.token_sort_ratio(fencer["text"], name)
         if score > 80:
@@ -81,15 +88,16 @@ def get_fencer_info(fencer):
         embed.set_thumbnail(url="https://flagsapi.com/" +
                             flag.upper() + "/flat/64.png")
 
-    ratings = soup.find_all("article")[2]
+    ratings = soup.find_all("article")[1]
     table = ratings.find("table")
     body = table.find("tbody")
     rows = body.find_all("tr")
 
     for row in rows:
         cells = row.find_all("td")
-        embed.add_field(name=cells[0].text, value=cells[1].text +
-                        " (" + cells[2].text + ") ", inline=True)
+        rating = re.sub(r"\(.*?\)", "", cells[1].text)
+        value = rating + " (" + cells[2].text + ") ".replace("\n", "")
+        embed.add_field(name=cells[0].text, value=value, inline=True)
 
     return embed
 
