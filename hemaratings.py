@@ -24,6 +24,8 @@ async def on_ready():
     reload_fencers.start()
     print(f'Logged in as {client.user} (ID: {client.user.id})')
     print('------')
+    for guild in client.guilds:        
+        print(f"Connected to {guild.name} with {guild.member_count} members")
     await tree.sync()
 
 # Display hemaratings by name
@@ -95,12 +97,13 @@ def get_fencer_info(fencer):
 
     for row in rows:
         cells = row.find_all("td")
-        rating = re.sub(r"\(.*?\)", "", cells[1].text)
-        embed.add_field(
-            name=cells[0].text,
-            value=rating + " (" + cells[2].text + ") ".replace("\n", ""),
-            inline=True
-        )
+        if len(cells) > 1:
+            rating = re.sub(r"\(.*?\)", "", cells[1].text)
+            embed.add_field(
+                name=cells[0].text.lstrip("- "),
+                value=rating + " (" + cells[2].text + ") ".replace("\n", ""),
+                inline=True
+            )
 
     return embed
 
