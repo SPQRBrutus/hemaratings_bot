@@ -24,7 +24,7 @@ async def on_ready():
     reload_fencers.start()
     print(f'Logged in as {client.user} (ID: {client.user.id})')
     print('------')
-    for guild in client.guilds:        
+    for guild in client.guilds:
         print(f"Connected to {guild.name} with {guild.member_count} members")
     await tree.sync()
 
